@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +28,8 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -100,13 +104,15 @@ public class MainActivity extends AppCompatActivity {
             } else if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 //bluetooth device found
                 BluetoothDevice device = (BluetoothDevice) intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                if(device.getName().contains("Mi True Wireless")){ //E8:EC:A3:94:8B:75 Mi True Wireless EBs Basic_R
+                if(device.getName().contains("HC")){ //E8:EC:A3:94:8B:75 Mi True Wireless EBs Basic_R
                     ConnectThread connectThread = new ConnectThread(device);
                     connectThread.start();
-                    Log.e(TAG, "Mi True Wireless found");
+                    Log.e(TAG, "ARDUINO FOUND");
                 }else{
                     Log.e(TAG,"Found Device " + device.getName() + " --- " + device.getAddress());
                 }
+
+
             } else if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
                 final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
                 if(state == BluetoothAdapter.STATE_ON){
@@ -173,6 +179,9 @@ public class MainActivity extends AppCompatActivity {
                     Log.e(TAG, "Could not close the client socket", closeException);
                 }*/
             }
+            MyBluetoothService.ConnectedThread connectedThread = new MyBluetoothService.ConnectedThread(mmSocket);
+             connectedThread.start();
+
 
             // The connection attempt succeeded. Perform work associated with
             // the connection in a separate thread.
@@ -188,6 +197,13 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG, "Could not close the client socket", e);
             }
         }
+
+
     }
 
-}
+
+        }
+
+
+
+
