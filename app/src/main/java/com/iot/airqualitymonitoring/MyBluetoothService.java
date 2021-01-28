@@ -2,6 +2,7 @@ package com.iot.airqualitymonitoring;
 
 import android.bluetooth.BluetoothSocket;
 import android.os.Bundle;
+import android.os.Looper;
 import android.os.Message;
 import android.os.Handler;
 import android.util.Log;
@@ -37,6 +38,7 @@ public class MyBluetoothService {
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
 
+
             // Get the input and output streams; using temp objects because
             // member streams are final.
             try {
@@ -63,12 +65,17 @@ public class MyBluetoothService {
                 try {
                     // Read from the InputStream.
                     numBytes = mmInStream.read(mmBuffer);
-                    Log.e(TAG,"XX++AX"+numBytes);
-                    // Send the obtained bytes to the UI activity.
-                    /*Message readMsg = handler.obtainMessage(
-                            MessageConstants.MESSAGE_READ, numBytes, -1,
-                            mmBuffer);
-                    readMsg.sendToTarget();*/
+                     //Send the obtained bytes to the UI activity.
+                    handler = new Handler(Looper.getMainLooper());
+                    Message readMsg = handler.obtainMessage(MessageConstants.MESSAGE_READ, numBytes, -1, mmBuffer);
+                    byte[] readBuf = (byte[]) readMsg.obj;
+                    // construct a string from the valid bytes in the buffer
+                    String readMessage = new String(readBuf, 0, readMsg.arg1);
+                    readMsg.sendToTarget();
+                    Log.e(TAG,"DATAVALUE : "+readMessage);
+
+
+
                 } catch (IOException e) {
                     Log.d(TAG, "Input stream was disconnected", e);
                     break;
