@@ -1,5 +1,6 @@
 package com.iot.airqualitymonitoring;
 
+import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -7,6 +8,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,6 +21,8 @@ import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -29,6 +33,7 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
     private final static int REQUEST_ENABLE_BT = 1;
     private static UUID MY_UUID = UUID.fromString("7ff8a1fe-23fd-4f7b-84be-33d822e5868d");
     private static String TAG = "FragmentActivity";
@@ -41,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        enableBluetooth();
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothDevice.ACTION_FOUND);
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
@@ -53,27 +57,54 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initialize() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            enableBluetooth();
+        } else {
+            requestLocationPermission();
+        }
         measurements = new ArrayList<Measurement>();
         listView = (ListView) findViewById(R.id.listView);
-        listViewAdapter = new MeasurementListAdapter(MainActivity.this,measurements);
+        listViewAdapter = new MeasurementListAdapter(MainActivity.this, measurements);
         listView.setAdapter(listViewAdapter);
     }
 
-    private void fillArrayList(ArrayList<Measurement>measurements){
+    private void fillArrayList(ArrayList<Measurement> measurements) {
         for (int index = 0; index < 20; index++) {
             Measurement measurement = new Measurement("13.01.2021 18:00 ", 20 * index);
             measurements.add(measurement);
         }
-
     }
 
-    private void enableBluetooth(){
+    public void requestLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_REQUEST_LOCATION);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            enableBluetooth();
+        }
+    }
+
+
+    private void enableBluetooth() {
         if (bluetoothAdapter != null) {
 
             if (!bluetoothAdapter.isEnabled()) {
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-            }else{
+            } else {
                 bluetoothAdapter.startDiscovery();
             }
         }
@@ -85,24 +116,24 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
-                Toast.makeText(getApplicationContext(),"Discovery Start",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Discovery Start", Toast.LENGTH_SHORT).show();
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                Toast.makeText(getApplicationContext(),"Discovery End",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Discovery End", Toast.LENGTH_SHORT).show();
             } else if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 //bluetooth device found
                 BluetoothDevice device = (BluetoothDevice) intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                if(device.getName().contains("HC")){ //E8:EC:A3:94:8B:75 Mi True Wireless EBs Basic_R
+                if (device.getName().contains("HC")) { //E8:EC:A3:94:8B:75 Mi True Wireless EBs Basic_R
                     ConnectThread connectThread = new ConnectThread(device);
                     connectThread.start();
                     Log.e(TAG, "ARDUINO FOUND");
-                }else{
-                    Log.e(TAG,"Found Device " + device.getName() + " --- " + device.getAddress());
+                } else {
+                    Log.e(TAG, "Found Device " + device.getName() + " --- " + device.getAddress());
                 }
 
 
             } else if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
                 final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
-                if(state == BluetoothAdapter.STATE_ON){
+                if (state == BluetoothAdapter.STATE_ON) {
                     bluetoothAdapter.startDiscovery();
                 }
             }
@@ -148,19 +179,19 @@ public class MainActivity extends AppCompatActivity {
 
                 try {
                     Class<?> clazz = mmSocket.getRemoteDevice().getClass();
-                    Class<?>[] paramTypes = new Class<?>[] {Integer.TYPE};
+                    Class<?>[] paramTypes = new Class<?>[]{Integer.TYPE};
 
                     Method m = clazz.getMethod("createRfcommSocket", paramTypes);
-                    Object[] params = new Object[] {Integer.valueOf(1)};
+                    Object[] params = new Object[]{Integer.valueOf(1)};
 
                     mmSocket = (BluetoothSocket) m.invoke(mmSocket.getRemoteDevice(), params);
                     mmSocket.connect();
-                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | IOException e ) {
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | IOException e) {
                     e.printStackTrace();
                 }
             }
             MyBluetoothService.ConnectedThread connectedThread = new MyBluetoothService.ConnectedThread(mmSocket, mHandler);
-             connectedThread.start();
+            connectedThread.start();
 
         }
 
@@ -181,8 +212,8 @@ public class MainActivity extends AppCompatActivity {
             byte[] readBuf = (byte[]) msg.obj;
             // construct a string from the valid bytes in the buffer
             String readMessage = new String(readBuf, 0, msg.arg1);
-            Log.e(TAG,"Air Quality Value: "+readMessage);
+            Log.e(TAG, "Air Quality Value: " + readMessage);
         }
     };
 
-        }
+}
