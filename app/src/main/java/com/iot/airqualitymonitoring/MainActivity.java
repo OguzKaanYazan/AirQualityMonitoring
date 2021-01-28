@@ -10,34 +10,22 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Measurement> measurements;
     private ListView listView;
     private MeasurementListAdapter listViewAdapter;
-    private OkHttpClient client = new OkHttpClient();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,8 +112,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        // Don't forget to unregister the ACTION_FOUND receiver.
         unregisterReceiver(receiver);
     }
 
@@ -173,20 +158,10 @@ public class MainActivity extends AppCompatActivity {
                 } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | IOException e ) {
                     e.printStackTrace();
                 }
-               /* try {
-                    mmSocket.close();
-                } catch (IOException closeException) {
-                    Log.e(TAG, "Could not close the client socket", closeException);
-                }*/
             }
-            MyBluetoothService.ConnectedThread connectedThread = new MyBluetoothService.ConnectedThread(mmSocket);
+            MyBluetoothService.ConnectedThread connectedThread = new MyBluetoothService.ConnectedThread(mmSocket, mHandler);
              connectedThread.start();
 
-
-            // The connection attempt succeeded. Perform work associated with
-            // the connection in a separate thread.
-            //manageMyConnectedSocket(mmSocket);
-            //Toast.makeText(getApplicationContext(),"Connected",Toast.LENGTH_SHORT).show();
         }
 
         // Closes the client socket and causes the thread to finish.
@@ -198,12 +173,16 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-
     }
 
+    private final Handler mHandler = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(Message msg) {
+            byte[] readBuf = (byte[]) msg.obj;
+            // construct a string from the valid bytes in the buffer
+            String readMessage = new String(readBuf, 0, msg.arg1);
+            Log.e(TAG,"Air Quality Value: "+readMessage);
+        }
+    };
 
         }
-
-
-
-
