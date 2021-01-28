@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,9 +22,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -47,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         enableBluetooth();
-        //bluetoothAdapter.startDiscovery();
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothDevice.ACTION_FOUND);
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
@@ -75,7 +78,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void enableBluetooth(){
         if (bluetoothAdapter != null) {
-            // Device doesn't support Bluetooth
 
             if (!bluetoothAdapter.isEnabled()) {
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -88,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Create a BroadcastReceiver for ACTION_FOUND.
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
+        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
@@ -99,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
                 BluetoothDevice device = (BluetoothDevice) intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 if(device.getName().contains("Mi True Wireless")){ //E8:EC:A3:94:8B:75 Mi True Wireless EBs Basic_R
                     ConnectThread connectThread = new ConnectThread(device);
-                    connectThread.run();
+                    connectThread.start();
                     Log.e(TAG, "Mi True Wireless found");
                 }else{
                     Log.e(TAG,"Found Device " + device.getName() + " --- " + device.getAddress());
@@ -122,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private class ConnectThread extends Thread {
-        private final BluetoothSocket mmSocket;
+        private BluetoothSocket mmSocket;
         private final BluetoothDevice mmDevice;
 
         public ConnectThread(BluetoothDevice device) {
@@ -130,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
             // because mmSocket is final.
             BluetoothSocket tmp = null;
             mmDevice = device;
+            Log.e(TAG, "Device" + mmDevice);
 
             try {
                 // Get a BluetoothSocket to connect with the given BluetoothDevice.
@@ -139,31 +143,41 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG, "Socket's create() method failed", e);
             }
             mmSocket = tmp;
+            Log.e(TAG, mmSocket.toString());
         }
 
         public void run() {
             // Cancel discovery because it otherwise slows down the connection.
             bluetoothAdapter.cancelDiscovery();
-
             try {
                 // Connect to the remote device through the socket. This call blocks
                 // until it succeeds or throws an exception.
                 mmSocket.connect();
             } catch (IOException connectException) {
-                Log.e(TAG, "CONNECT ERROR" + connectException.getMessage());
+
                 try {
+                    Class<?> clazz = mmSocket.getRemoteDevice().getClass();
+                    Class<?>[] paramTypes = new Class<?>[] {Integer.TYPE};
+
+                    Method m = clazz.getMethod("createRfcommSocket", paramTypes);
+                    Object[] params = new Object[] {Integer.valueOf(1)};
+
+                    mmSocket = (BluetoothSocket) m.invoke(mmSocket.getRemoteDevice(), params);
+                    mmSocket.connect();
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | IOException e ) {
+                    e.printStackTrace();
+                }
+               /* try {
                     mmSocket.close();
                 } catch (IOException closeException) {
                     Log.e(TAG, "Could not close the client socket", closeException);
-                }
-                return;
+                }*/
             }
 
             // The connection attempt succeeded. Perform work associated with
             // the connection in a separate thread.
             //manageMyConnectedSocket(mmSocket);
-            Toast.makeText(getApplicationContext(),"Connected",Toast.LENGTH_SHORT).show();
-
+            //Toast.makeText(getApplicationContext(),"Connected",Toast.LENGTH_SHORT).show();
         }
 
         // Closes the client socket and causes the thread to finish.
