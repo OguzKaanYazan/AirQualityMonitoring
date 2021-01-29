@@ -28,7 +28,14 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -52,8 +59,9 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(receiver, filter);
-        initialize();
-        fillArrayList(measurements);
+        //initialize();
+        //fillArrayList(measurements);
+        getMeasurements();
     }
 
     private void initialize() {
@@ -72,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void fillArrayList(ArrayList<Measurement> measurements) {
         for (int index = 0; index < 20; index++) {
-            Measurement measurement = new Measurement("13.01.2021 18:00 ", 20 * index);
+            Measurement measurement = new Measurement("13.01.2021 18:00 ", 20.0 * index);
             measurements.add(measurement);
         }
     }
@@ -215,5 +223,32 @@ public class MainActivity extends AppCompatActivity {
             Log.e(TAG, "Air Quality Value: " + readMessage);
         }
     };
+
+    public void getMeasurements() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://industrial.api.ubidots.com/api/v1.6/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        UbidotsApi ubidotsApi = retrofit.create(UbidotsApi.class);
+        Call<Result> call = ubidotsApi.getMeasurements();
+
+        call.enqueue(new Callback<Result>() {
+            @Override
+            public void onResponse(Call<Result> call, Response<Result> response) {
+                if (!response.isSuccessful()) {
+                    Log.e(TAG, "UNSUCCESSFUL");
+                    return;
+                }
+                ArrayList<Measurement> measurements = response.body().getResults();
+                Log.e(TAG, "measurement 1 " + measurements.get(0).getAir_quality());
+
+            }
+
+            @Override
+            public void onFailure(Call<Result> call, Throwable t) {
+                Log.e(TAG, "WEB SERVICE ERROR" + t);
+            }
+        });
+    }
 
 }

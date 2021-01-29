@@ -2,19 +2,19 @@ package com.iot.airqualitymonitoring;
 
 public class Measurement {
     private String date;
-    private int air_quality;
+    private Double value;
 
-    public Measurement(String date, int air_quality){
+    public Measurement(String date, Double air_quality) {
         this.date = date;
-        this.air_quality = air_quality;
+        this.value = air_quality;
     }
 
-    public int getAir_quality() {
-        return air_quality;
+    public Double getAir_quality() {
+        return value;
     }
 
-    public void setAir_quality(int air_quality) {
-        this.air_quality = air_quality;
+    public void setAir_quality(Double air_quality) {
+        this.value = air_quality;
     }
 
     public String getDate() {
@@ -25,22 +25,22 @@ public class Measurement {
         this.date = date;
     }
 
-    public int getStatusImg(){
-        if(this.air_quality < 100){
+    public int getStatusImg() {
+        if (this.value < 100) {
             return R.drawable.great; //GREAT
-        }else if(this.air_quality >= 100 && this.air_quality < 200){
+        } else if (this.value >= 100 && this.value < 200) {
             return R.drawable.okay; //OKAY
-        }else{
+        } else {
             return R.drawable.unhealthy; //BAD
         }
     }
 
-    public String getStatusTxt(){
-        if(this.air_quality < 100){
+    public String getStatusTxt() {
+        if (this.value < 100) {
             return "Great!";
-        }else if(this.air_quality >= 100 && this.air_quality < 200){
+        } else if (this.value >= 100 && this.value < 200) {
             return "Okay.";
-        }else{
+        } else {
             return "Unhealthy!";
         }
     }
