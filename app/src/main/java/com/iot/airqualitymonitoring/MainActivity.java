@@ -15,6 +15,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -46,15 +48,24 @@ public class MainActivity extends AppCompatActivity {
     private static UUID MY_UUID = UUID.fromString("7ff8a1fe-23fd-4f7b-84be-33d822e5868d");
     private static String TAG = "FragmentActivity";
     private BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-    private ArrayList<Measurement> Measurements;
-    private ListView listView;
-    private MeasurementListAdapter listViewAdapter;
     private UbidotsApi ubidotsApi;
+    private Button bt1;
+    private Button bt2;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        bt1 = (Button) findViewById(R.id.bt1);
+
+      bt1.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+           navigateMeasurementList();
+          }
+      }
+      );
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothDevice.ACTION_FOUND);
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
@@ -62,7 +73,10 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(receiver, filter);
         initialize();
-        getMeasurements();
+    }
+    public void navigateMeasurementList(){
+        Intent intent = new Intent(this,MeasurementList.class);
+        startActivity(intent);
     }
 
     private void initialize() {
@@ -79,14 +93,6 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         ubidotsApi = retrofit.create(UbidotsApi.class);
     }
-
-    private void setMeasurementList(ArrayList<Measurement> measurements) {
-        Measurements = measurements;
-        listView = (ListView) findViewById(R.id.listView);
-        listViewAdapter = new MeasurementListAdapter(MainActivity.this, Measurements);
-        listView.setAdapter(listViewAdapter);
-    }
-
     public void requestLocationPermission() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
@@ -227,31 +233,8 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    public void getMeasurements() {
-        Call<Result> call = ubidotsApi.getMeasurements("BBFF-ItcDdqK6QlvvhSoZfbiT5qqKMXM2Y0Xg2nJSOsXosSTBd0P1BVH3uIY",
-                "5ffb67f51d847259aadf54e2");
-
-        call.enqueue(new Callback<Result>() {
-            @Override
-            public void onResponse(Call<Result> call, Response<Result> response) {
-                if (!response.isSuccessful()) {
-                    Log.e(TAG, "UNSUCCESSFUL");
-                    return;
-                }
-                ArrayList<Measurement> measurements = response.body().getResults();
-                setMeasurementList(measurements);
-                Log.e(TAG, "measurement 1 " + measurements.get(0).getAir_quality());
-            }
-
-            @Override
-            public void onFailure(Call<Result> call, Throwable t) {
-                Log.e(TAG, "WEB SERVICE ERROR " + t);
-            }
-        });
-    }
-
     public void insertMeasurement(Measurement measurement) {
-        Call<Measurement> call = ubidotsApi.insertMeasurement("BBFF-4WdB1TJgsLvbybwSMKB9sZvkH7Q37hUw98efPaSNDeiLqYHSQzbkBiX",
+        Call<Measurement> call = ubidotsApi.insertMeasurement("BBFF-norosSxHQrXBNKtipKjr5RiSM9n4wY",
                 measurement);
 
         call.enqueue(new Callback<Measurement>() {
