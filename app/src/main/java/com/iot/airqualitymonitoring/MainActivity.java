@@ -37,6 +37,8 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static java.lang.Double.parseDouble;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Measurement> measurements;
     private ListView listView;
     private MeasurementListAdapter listViewAdapter;
+    private UbidotsApi ubidotsApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,9 +62,11 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(receiver, filter);
-        //initialize();
+        initialize();
         //fillArrayList(measurements);
-        getMeasurements();
+        //getMeasurements();
+        Measurement m = new Measurement("XX", 58.0);
+        //insertMeasurement(m);
     }
 
     private void initialize() {
@@ -72,6 +77,11 @@ public class MainActivity extends AppCompatActivity {
         } else {
             requestLocationPermission();
         }
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://industrial.api.ubidots.com/api/v1.6/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        ubidotsApi = retrofit.create(UbidotsApi.class);
         measurements = new ArrayList<Measurement>();
         listView = (ListView) findViewById(R.id.listView);
         listViewAdapter = new MeasurementListAdapter(MainActivity.this, measurements);
@@ -200,7 +210,6 @@ public class MainActivity extends AppCompatActivity {
             }
             MyBluetoothService.ConnectedThread connectedThread = new MyBluetoothService.ConnectedThread(mmSocket, mHandler);
             connectedThread.start();
-
         }
 
         // Closes the client socket and causes the thread to finish.
@@ -220,17 +229,15 @@ public class MainActivity extends AppCompatActivity {
             byte[] readBuf = (byte[]) msg.obj;
             // construct a string from the valid bytes in the buffer
             String readMessage = new String(readBuf, 0, msg.arg1);
+            Measurement m = new Measurement("XX", parseDouble(readMessage));
+            insertMeasurement(m);
             Log.e(TAG, "Air Quality Value: " + readMessage);
         }
     };
 
     public void getMeasurements() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://industrial.api.ubidots.com/api/v1.6/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        UbidotsApi ubidotsApi = retrofit.create(UbidotsApi.class);
-        Call<Result> call = ubidotsApi.getMeasurements();
+        Call<Result> call = ubidotsApi.getMeasurements("BBFF-ItcDdqK6QlvvhSoZfbiT5qqKMXM2Y0Xg2nJSOsXosSTBd0P1BVH3uIY",
+                "5ffb67f51d847259aadf54e2");
 
         call.enqueue(new Callback<Result>() {
             @Override
@@ -246,7 +253,27 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<Result> call, Throwable t) {
-                Log.e(TAG, "WEB SERVICE ERROR" + t);
+                Log.e(TAG, "WEB SERVICE ERROR " + t);
+            }
+        });
+    }
+
+    public void insertMeasurement(Measurement measurement) {
+        Call<Measurement> call = ubidotsApi.insertMeasurement("BBFF-4WdB1TJgsLvbybwSMKB9sZvkH7Q37hUw98efPaSNDeiLqYHSQzbkBiX",
+                measurement);
+
+        call.enqueue(new Callback<Measurement>() {
+            @Override
+            public void onResponse(Call<Measurement> call, Response<Measurement> response) {
+                if (!response.isSuccessful()) {
+                    Log.e(TAG, "UNSUCCESSFUL " + response.message());
+                    return;
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Measurement> call, Throwable t) {
+                Log.e(TAG, "WEB SERVICE ERROR " + t);
             }
         });
     }
