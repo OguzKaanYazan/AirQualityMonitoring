@@ -12,9 +12,6 @@ public interface UbidotsApi {
     @GET("variables/{id}/values")
     Call<Result> getMeasurements(@Header("X-Auth-Token") String token, @Path("id") String id);
 
-    @POST("devices/air-quality-monitoring/airQuality/values")
+    @POST("devices/air-quality/air-quality/values")
     Call<Measurement> insertMeasurement(@Header("X-Auth-Token") String token, @Body Measurement measurement);
-
-    @POST("auth/token/")
-    Call<Object> auth(@Header("x-ubidots-apikey") String apikey);
 }
