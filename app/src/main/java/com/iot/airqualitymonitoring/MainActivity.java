@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import retrofit2.Call;
@@ -47,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private static UUID MY_UUID = UUID.fromString("7ff8a1fe-23fd-4f7b-84be-33d822e5868d");
     private static String TAG = "FragmentActivity";
     private BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-    private ArrayList<Measurement> measurements;
+    private ArrayList<Measurement> Measurements;
     private ListView listView;
     private MeasurementListAdapter listViewAdapter;
     private UbidotsApi ubidotsApi;
@@ -63,10 +62,7 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(receiver, filter);
         initialize();
-        //fillArrayList(measurements);
-        //getMeasurements();
-        Measurement m = new Measurement("XX", 58.0);
-        //insertMeasurement(m);
+        getMeasurements();
     }
 
     private void initialize() {
@@ -82,17 +78,13 @@ public class MainActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         ubidotsApi = retrofit.create(UbidotsApi.class);
-        measurements = new ArrayList<Measurement>();
-        listView = (ListView) findViewById(R.id.listView);
-        listViewAdapter = new MeasurementListAdapter(MainActivity.this, measurements);
-        listView.setAdapter(listViewAdapter);
     }
 
-    private void fillArrayList(ArrayList<Measurement> measurements) {
-        for (int index = 0; index < 20; index++) {
-            Measurement measurement = new Measurement("13.01.2021 18:00 ", 20.0 * index);
-            measurements.add(measurement);
-        }
+    private void setMeasurementList(ArrayList<Measurement> measurements) {
+        Measurements = measurements;
+        listView = (ListView) findViewById(R.id.listView);
+        listViewAdapter = new MeasurementListAdapter(MainActivity.this, Measurements);
+        listView.setAdapter(listViewAdapter);
     }
 
     public void requestLocationPermission() {
@@ -247,8 +239,8 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
                 ArrayList<Measurement> measurements = response.body().getResults();
+                setMeasurementList(measurements);
                 Log.e(TAG, "measurement 1 " + measurements.get(0).getAir_quality());
-
             }
 
             @Override
