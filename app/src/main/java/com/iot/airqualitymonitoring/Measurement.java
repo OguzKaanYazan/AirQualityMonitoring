@@ -1,11 +1,15 @@
 package com.iot.airqualitymonitoring;
 
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+
 public class Measurement {
-    private String date;
+    private String timestamp;
     private Double value;
 
     public Measurement(String date, Double air_quality) {
-        this.date = date;
+        this.timestamp = date;
         this.value = air_quality;
     }
 
@@ -18,11 +22,14 @@ public class Measurement {
     }
 
     public String getDate() {
-        return date;
+        Timestamp stamp = new Timestamp(Long.valueOf(timestamp));
+        Date date = new Date(stamp.getTime());
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        return formatter.format(date);
     }
 
     public void setDate(String date) {
-        this.date = date;
+        this.timestamp = date;
     }
     public int getStatusImg() {
         if (this.value < 250) {
