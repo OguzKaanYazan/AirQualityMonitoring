@@ -1,44 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/button1"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
-    tools:context=".MainActivity"
-    android:orientation="vertical"
-    >
->
-
-
-    <Button
-        android:id="@+id/bt2"
-        android:layout_width="250dp"
-        android:layout_height="60dp"
-        android:text="Reports"
-        android:textAllCaps="false"
-        android:textColor="#FFFFFF"
-        android:textSize="20sp"
-        android:layout_margin="15dp"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="69dp"
-        tools:layout_editor_absoluteY="378dp" />
-
-    <Button
-        android:id="@+id/bt1"
-        android:layout_width="250dp"
-        android:layout_height="60dp"
-        android:layout_margin="15dp"
-        android:text="Measurements"
-        android:textAllCaps="false"
-        android:textColor="#FFFFFF"
-        android:textSize="20sp"
-
-
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="66dp"
-        tools:layout_editor_absoluteY="234dp" />
-
-
+    android:background="#FF0000"
+    android:weightSum="4"
+    > <!-- to show what the parent is -->
+    <LinearLayout
+        android:id="@+id/lay"
+        android:background="@drawable/measurements"
+        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_weight="2"
+        android:orientation="horizontal" />
+    <LinearLayout
+        android:id="@+id/lay2"
+        android:background="@drawable/visualization"
+        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_weight="2"
+        android:orientation="horizontal" />
 </LinearLayout>
