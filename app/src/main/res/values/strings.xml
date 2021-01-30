@@ -1,6 +1,4 @@
 <resources>
     <string name="app_name">Air Quality Monitoring</string>
     <string name="title_activity_report">MainActivity</string>
-    <string name="title_home">Summary</string>
-    <string name="title_dashboard">Visual Report</string>
 </resources>

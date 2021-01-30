@@ -7,8 +7,18 @@
         android:title="Summary" />
 
     <item
-        android:id="@+id/navigation_dashboard"
+        android:id="@+id/navigation_lineChart"
+        android:icon="@drawable/ic_baseline_show_chart_24"
+        android:title="Line Chart" />
+
+    <item
+        android:id="@+id/navigation_barChart"
         android:icon="@drawable/ic_baseline_bar_chart_24"
-        android:title="Visual Report" />
+        android:title="Bar Chart" />
+
+    <item
+        android:id="@+id/navigation_pieChart"
+        android:icon="@drawable/ic_baseline_pie_chart_24"
+        android:title="Pie Chart" />
 
 </menu>

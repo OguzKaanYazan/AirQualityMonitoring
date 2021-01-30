@@ -8,12 +8,24 @@
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.iot.airqualitymonitoring.ui.summary.SummaryFragment"
-        android:label="@string/title_home"
+        android:label="Report"
         tools:layout="@layout/fragment_summary" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="com.iot.airqualitymonitoring.ui.visual_report.ReportFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_visual_report" />
+        android:id="@+id/navigation_lineChart"
+        android:name="com.iot.airqualitymonitoring.ui.line_chart.LineChartFragment"
+        android:label="Report"
+        tools:layout="@layout/fragment_line_chart" />
+
+    <fragment
+        android:id="@+id/navigation_barChart"
+        android:name="com.iot.airqualitymonitoring.ui.bar_chart.BarChartFragment"
+        android:label="Report"
+        tools:layout="@layout/fragment_bar_chart" />
+
+    <fragment
+        android:id="@+id/navigation_pieChart"
+        android:name="com.iot.airqualitymonitoring.ui.pie_chart.PieChartFragment"
+        android:label="Report"
+        tools:layout="@layout/fragment_pie_chart" />
 </navigation>

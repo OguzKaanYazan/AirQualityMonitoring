@@ -1,20 +1,19 @@
-package com.iot.airqualitymonitoring.ui.visual_report;
+package com.iot.airqualitymonitoring.ui.line_chart;
 
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.iot.airqualitymonitoring.Measurement;
-import com.iot.airqualitymonitoring.MeasurementListAdapter;
 import com.iot.airqualitymonitoring.R;
 import com.iot.airqualitymonitoring.Result;
 import com.iot.airqualitymonitoring.UbidotsApi;
@@ -28,25 +27,18 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class ReportFragment extends Fragment {
+public class LineChartFragment extends Fragment {
 
-    private ReportViewModel dashboardViewModel;
     private View root;
     private static String TAG = "FragmentActivity";
-    private ArrayList<Measurement> Measurements;
-    private ListView listView;
-    private MeasurementListAdapter listViewAdapter;
     private UbidotsApi ubidotsApi;
-    LineChart chart ;
+    LineChart lineChart ;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        dashboardViewModel =
-                new ViewModelProvider(this).get(ReportViewModel.class);
-        root = inflater.inflate(R.layout.fragment_visual_report, container, false);
-        chart = (LineChart) root.findViewById(R.id.chart);
+        root = inflater.inflate(R.layout.fragment_line_chart, container, false);
+        lineChart = (LineChart) root.findViewById(R.id.chart);
         initialize();
-        setCharts();
         return root;
     }
 
@@ -71,7 +63,7 @@ public class ReportFragment extends Fragment {
                     return;
                 }
                 ArrayList<Measurement> measurements = response.body().getResults();
-                setMeasurements(measurements);
+                setCharts(measurements);
                 Log.e(TAG, "measurement 1 " + measurements.get(0).getAir_quality());
             }
 
@@ -82,12 +74,17 @@ public class ReportFragment extends Fragment {
         });
     }
 
-    public void setMeasurements(ArrayList<Measurement> m){
-        Measurements = m;
-    }
-
-    public void setCharts(){
+    public void setCharts(ArrayList<Measurement> m){
         List<Entry> entries = new ArrayList<Entry>();
+
+        for (Measurement measurement : m) {
+            entries.add(new Entry(m.indexOf(measurement), measurement.getAir_quality().floatValue()));
+        }
+
+        LineDataSet dataSet = new LineDataSet(entries, "Air Quality"); // add entries to dataset
+        LineData lineData = new LineData(dataSet);
+        lineChart.setData(lineData);
+        lineChart.invalidate();
 
     }
 }
