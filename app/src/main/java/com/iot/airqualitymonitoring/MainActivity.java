@@ -53,9 +53,8 @@ public class MainActivity extends AppCompatActivity {
     private static String TAG = "FragmentActivity";
     private BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     private UbidotsApi ubidotsApi;
-    //private ImageView bt1;
-    //private Button bt2;
     private LinearLayout lay;
+    private LinearLayout lay2;
 
 
     @Override
@@ -64,17 +63,26 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //bt1 =  findViewById(R.id.bt1);
         lay = findViewById(R.id.lay);
+        lay2 = findViewById(R.id.lay2);
 
 
-      lay.setOnClickListener(new View.OnClickListener() {
-          @Override
-          public void onClick(View v) {
-           navigateMeasurementList();
-          }
-      }
-      );
+        lay.setOnClickListener(new View.OnClickListener() {
+                                   @Override
+                                   public void onClick(View v) {
+                                       navigateMeasurementList();
+                                   }
+                               }
+        );
+
+        lay2.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        navigateReport();
+                                    }
+                                }
+        );
+
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothDevice.ACTION_FOUND);
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
@@ -83,8 +91,14 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(receiver, filter);
         initialize();
     }
-    public void navigateMeasurementList(){
-        Intent intent = new Intent(this,MeasurementList.class);
+
+    public void navigateMeasurementList() {
+        Intent intent = new Intent(this, MeasurementList.class);
+        startActivity(intent);
+    }
+
+    public void navigateReport() {
+        Intent intent = new Intent(this, Report.class);
         startActivity(intent);
     }
 
@@ -102,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         ubidotsApi = retrofit.create(UbidotsApi.class);
     }
+
     public void requestLocationPermission() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
