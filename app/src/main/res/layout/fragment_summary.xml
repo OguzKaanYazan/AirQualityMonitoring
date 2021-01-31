@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+ <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fillViewport="true">
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:orientation="vertical">
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -12,14 +18,13 @@
         android:background="@drawable/border"
         android:orientation="vertical"
         android:gravity="center"
-        android:layout_weight="1"
+        android:layout_weight="0.50"
 
 
         android:padding="15dp">
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:textSize="15sp"
             android:textStyle="bold"
             android:text="MAX VALUE OF THE AIR QUALITY DATA"
@@ -29,13 +34,14 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:textSize="15sp"
             android:textStyle="bold"
+            android:layout_weight="0.25"
             android:id="@+id/airqmax"
             android:gravity="center"
             />
     </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -44,14 +50,13 @@
         android:layout_marginTop="10dp"
         android:orientation="vertical"
         android:gravity="center"
-        android:layout_weight="1"
+        android:layout_weight="0.50"
 
         android:padding="15dp">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:textSize="15sp"
             android:textStyle="bold"
             android:text="MIN VALUE OF THE AIR QUALITY DATA"
@@ -60,13 +65,14 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="0.25"
             android:textSize="15sp"
             android:textStyle="bold"
             android:id="@+id/airqmin"
             android:gravity="center"
             />
     </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -74,14 +80,13 @@
         android:layout_marginTop="10dp"
         android:orientation="vertical"
         android:gravity="center"
-        android:layout_weight="1"
+        android:layout_weight="0.50"
 
 
         android:padding="15dp">
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:textSize="15sp"
             android:textStyle="bold"
             android:text="MEAN OF THE AIR QUALITY DATA"
@@ -90,9 +95,9 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:textSize="15sp"
             android:textStyle="bold"
+            android:layout_weight="0.25"
             android:id="@+id/airqmean"
             android:gravity="center"
             />
@@ -104,14 +109,13 @@
         android:layout_marginTop="10dp"
         android:orientation="vertical"
         android:gravity="center"
-        android:layout_weight="1"
+        android:layout_weight="0.50"
 
 
         android:padding="15dp">
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:textSize="15sp"
             android:textStyle="bold"
             android:text="TOTAL COUNT OF THE AIR QUALITY DATA"
@@ -121,7 +125,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="0.50"
             android:textSize="15sp"
             android:textStyle="bold"
             android:id="@+id/airqcount"
@@ -129,5 +133,5 @@
 
             />
     </LinearLayout>
-
 </LinearLayout>
+</ScrollView>
