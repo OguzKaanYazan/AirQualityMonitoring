@@ -14,6 +14,6 @@ void loop() {
   bt_conn.println(analogRead(input));
   Serial.println(analogRead(input));
 
-  delay(60000);
+  delay(30000);
 
 }
