@@ -33,15 +33,15 @@ public class Measurement {
     }
 
     public int getStatusImg() {
-        if (this.value < 250) {
+        if (this.value < 200) {
             return R.drawable.great; //GREAT
-        } else if (this.value >= 250 && this.value < 350) {
+        } else if (this.value >= 200 && this.value < 350) {
             return R.drawable.okay;
-        } else if (this.value >= 350 && this.value < 400) {
+        } else if (this.value >= 350 && this.value < 500) {
             return R.drawable.beware; //OKAY
-        } else if (this.value >= 400 && this.value < 500) {
+        } else if (this.value >= 500 && this.value < 600) {
             return R.drawable.unhealthy;
-        } else if (this.value >= 500 && this.value < 650) {
+        } else if (this.value >= 600 && this.value < 700) {
             return R.drawable.vunhealthy;
         } else {
             return R.drawable.hazardous; //BAD
