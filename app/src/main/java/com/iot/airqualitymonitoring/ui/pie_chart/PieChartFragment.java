@@ -83,19 +83,19 @@ public class PieChartFragment extends Fragment {
         }
         for (Measurement measurement : m) {
             switch (measurement.getStatusTxt()) {
-                case "Great!":
+                case "Great":
                     statusList.set(0, statusList.get(0) + 1);
                     break;
-                case "Okay.":
+                case "Okay":
                     statusList.set(1, statusList.get(1) + 1);
                     break;
-                case "Sensitive beware.":
+                case "Sensitive beware":
                     statusList.set(2, statusList.get(2) + 1);
                     break;
                 case "Unhealthy":
                     statusList.set(3, statusList.get(3) + 1);
                     break;
-                case "Very Unhealthy.":
+                case "Very Unhealthy":
                     statusList.set(4, statusList.get(4) + 1);
                     break;
                 default:
