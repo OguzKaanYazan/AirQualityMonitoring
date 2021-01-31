@@ -42,7 +42,7 @@ public class SummaryFragment extends Fragment {
     private ListView listView;
     private MeasurementListAdapter listViewAdapter;
     private UbidotsApi ubidotsApi;
-    private TextView textViewMax, textViewMin, textViewMean, textViewCount;
+    private TextView textViewMax, textViewMin, textViewMean, textViewCount, textViewStatus;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -51,6 +51,7 @@ public class SummaryFragment extends Fragment {
         textViewMin = root.findViewById(R.id.airqmin);
         textViewMean = root.findViewById(R.id.airqmean);
         textViewCount = root.findViewById(R.id.airqcount);
+        textViewStatus = root.findViewById(R.id.airqstatus);
         initialize();
         return root;
     }
@@ -91,11 +92,11 @@ public class SummaryFragment extends Fragment {
         });
     }
     public void maxValue(ArrayList<Measurement> m){
-        List<Integer> values = new ArrayList<>();
+        List<Double> values = new ArrayList<>();
         for (Measurement measurement : m) {
-            values.add(measurement.getAir_quality().intValue());
+            values.add(measurement.getAir_quality());
         }
-        int max = Integer.MIN_VALUE;
+        Double max = Double.MIN_VALUE;
 
         for(int i=0; i<values.size(); i++){
             if(values.get(i) > max){
@@ -103,15 +104,15 @@ public class SummaryFragment extends Fragment {
             }
         }
 
-        textViewMax.setText(String.valueOf(max));
+        textViewMax.setText(String.valueOf(max) + " ppm");
 
     }
     public void minValue(ArrayList<Measurement> m){
-        List<Integer> minValues = new ArrayList<>();
+        List<Double> minValues = new ArrayList<>();
         for (Measurement measurement : m) {
-            minValues.add(measurement.getAir_quality().intValue());
+            minValues.add(measurement.getAir_quality());
         }
-        int min = Integer.MAX_VALUE;
+        Double min = Double.MAX_VALUE;
 
         for(int i=0; i<minValues.size(); i++){
             if(minValues.get(i) < min){
@@ -119,23 +120,24 @@ public class SummaryFragment extends Fragment {
             }
         }
 
-        textViewMin.setText(String.valueOf(min));
+        textViewMin.setText(String.valueOf(min) + " ppm");
 
     }
     public void meanValue(ArrayList<Measurement> m){
-        List<Integer> meanValues = new ArrayList<>();
+        List<Double> meanValues = new ArrayList<>();
         for (Measurement measurement : m) {
-            meanValues.add(measurement.getAir_quality().intValue());
+            meanValues.add(measurement.getAir_quality());
         }
-        int sum = 0;
+        Double sum = 0.0;
 
         for(int i=0; i<meanValues.size(); i++){
                 sum += meanValues.get(i);
-
         }
-        int mean = sum/meanValues.size();
+        Double mean = sum/meanValues.size();
 
-        textViewMean.setText(String.valueOf(mean));
+        setAvgStatus(mean);
+
+        textViewMean.setText(String.valueOf(mean) + " ppm");
 
     }
     public void count(ArrayList<Measurement> m){
@@ -146,6 +148,13 @@ public class SummaryFragment extends Fragment {
 
 
         textViewCount.setText(String.valueOf(countArray.size()));
+
+    }
+
+    public void setAvgStatus(Double avgValue){
+        Measurement m = new Measurement("date", avgValue);
+
+        textViewStatus.setText(m.getStatusTxt());
 
     }
 
